@@ -1,6 +1,13 @@
-// src/utils/dominoLogic.js
-const generateDoublePiece = (lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT) => {
-  const lastNumber = lastPiece.number2;
+// src/utils/LeftRightDominoLogic.js
+
+const generateDoublePiece = (
+  lastPiece,
+  isDouble,
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  isLeft
+) => {
+  const lastNumber = isLeft ? lastPiece.number1 : lastPiece.number2; // Comparar con el número de la izquierda si vamos hacia la izquierda
 
   const number1 = lastNumber;
   const number2 = lastNumber; // Ficha doble: mismo número en ambos lados
@@ -8,64 +15,82 @@ const generateDoublePiece = (lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT) => {
 
   let offsetX = TILE_HEIGHT / 2 + TILE_WIDTH / 2; // Usamos 90px de distancia por defecto
   if (!isDouble && lastPiece.rotation === 90) {
-    // Si la ficha anterior también es mixta (rotación 90 grados), sumamos 120px
     offsetX = TILE_HEIGHT; // 120px en este caso
   }
 
-  const newX = lastPiece.x + offsetX;
+  const newX = isLeft ? lastPiece.x - offsetX : lastPiece.x + offsetX; // Dirección controlada por isLeft
   const newY = lastPiece.y + 0; // El eje Y no cambia
 
   return { number1, number2, x: newX, y: newY, rotation };
 };
 
-const generateMixedPiece = (lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT) => {
-  const lastNumber = lastPiece.number2; // Aquí tomamos el número de la parte derecha de la ficha anterior
+const generateMixedPiece = (
+  lastPiece,
+  isDouble,
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  isLeft
+) => {
+  const lastNumber = isLeft ? lastPiece.number1 : lastPiece.number2;
 
   let number1, number2;
 
-  // Si la ficha anterior es doble o está en rotación 0 (horizontal)
-  if (isDouble || lastPiece.rotation === 0) {
-    number1 = lastNumber;
-    number2 = Math.floor(Math.random() * 5) + 1; // Escoge un número entre 1 y 5 para la parte mixta
-    if (number2 === lastNumber) {
-      number2 = Math.floor(Math.random() * 5) + 1; // Aseguramos que el número no sea igual al anterior
-    }
+  // Generar un número diferente al de referencia
+  const otherNumber = () => {
+    let num;
+    do {
+      num = Math.floor(Math.random() * 6);
+    } while (num === lastNumber);
+    return num;
+  };
+
+  if (isLeft) {
+    // Queremos que el lado derecho (number2) sea igual al número de la pieza a la izquierda
+    number1 = otherNumber();
+    number2 = lastNumber;
   } else {
-    // Si la ficha anterior es mixta, no puede repetir el número
+    // Queremos que el lado izquierdo (number1) sea igual al número de la pieza a la derecha
     number1 = lastNumber;
-    number2 = Math.floor(Math.random() * 5) + 1; // Escoge un número entre 1 y 5 para la parte mixta
-    if (number2 === lastNumber) {
-      number2 = Math.floor(Math.random() * 5) + 1; // Aseguramos que el número no sea igual al anterior
-    }
+    number2 = otherNumber();
   }
 
-  // **Rotación para las fichas mixtas**:
-  let rotation = 90; // Si el número más grande está a la derecha, rota 90
-  if (lastNumber !== number1) {
-    rotation = 270; // Si el número a la derecha es menor, rotamos 270°
+  // Determinar rotación (esto puede ajustarse si hay alguna orientación específica)
+  let rotation = 90;
+  if (isLeft && number1 === number2) {
+    rotation = 0;
   }
 
-  // **Cálculo de offsetX basado en el tipo de ficha anterior**:
-  let offsetX;
-  if (lastPiece.rotation === 0) {
-    // Si la ficha anterior es doble o está en posición horizontal (sin rotación)
-    offsetX = TILE_HEIGHT / 2 + TILE_WIDTH / 2; // Usamos la distancia por defecto
-  } else {
-    // Si la ficha anterior es mixta y está rotada (posiblemente 90° o 270°)
-    offsetX = TILE_HEIGHT; // Usamos el ancho de la ficha cuando la ficha anterior está rotada
-  }
+  let offsetX =
+    lastPiece.rotation === 0 ? TILE_HEIGHT / 2 + TILE_WIDTH / 2 : TILE_HEIGHT;
 
-  // **Ajuste del eje X para las nuevas coordenadas**:
-  const newX = lastPiece.x + offsetX;
-  const newY = lastPiece.y; // El eje Y no cambia
+  const newX = isLeft ? lastPiece.x - offsetX : lastPiece.x + offsetX;
+  const newY = lastPiece.y;
 
   return { number1, number2, x: newX, y: newY, rotation };
 };
 
-export const getNexPiece = (lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT) => {
+export const getNexPiece = (
+  lastPiece,
+  isDouble,
+  TILE_WIDTH,
+  TILE_HEIGHT,
+  isLeft
+) => {
   if (isDouble) {
-    return generateDoublePiece(lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT);
+    return generateDoublePiece(
+      lastPiece,
+      isDouble,
+      TILE_WIDTH,
+      TILE_HEIGHT,
+      isLeft
+    );
   } else {
-    return generateMixedPiece(lastPiece, isDouble, TILE_WIDTH, TILE_HEIGHT);
+    return generateMixedPiece(
+      lastPiece,
+      isDouble,
+      TILE_WIDTH,
+      TILE_HEIGHT,
+      isLeft
+    );
   }
 };

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import "./DominoPiece.css";
 
 const DominoPiece = ({ number1, number2, x, y, rotation }) => {
-  console.log(222, number1, number2, x, y, rotation);
   const getTileImageName = (n1, n2) => {
     const [min, max] = [Math.min(n1, n2), Math.max(n1, n2)];
     return `${max}${min}.png`;
