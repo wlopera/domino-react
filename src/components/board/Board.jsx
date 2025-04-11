@@ -1,58 +1,87 @@
 // src/components/Board.jsx
 import React, { useState } from "react";
 import DominoPiece from "../dominoPiece/DominoPiece";
-import { getNexPiece } from "../../utils/LeftRightDominoLogic";
+import { getNextPiece } from "../../utils/LeftRightDominoLogic";
+import {
+  INITIAL_POSITION,
+  BOARD_HEIGHT,
+  BOARD_WIDTH,
+} from "../../constants/DominoConstants";
 
+/**
+ * Componente que representa el tablero de dominó, donde las piezas son agregadas
+ * y mostradas en función de los parámetros configurados por el usuario.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} Componente que muestra el tablero de dominó y permite agregar piezas.
+ */
 const Board = () => {
-  const TILE_WIDTH = 60;
-  const TILE_HEIGHT = 120;
-
+  /**
+   * Estado que guarda las piezas del dominó en el tablero. Cada pieza es un objeto
+   * con las propiedades `number1`, `number2`, `x`, `y`, y `rotation`.
+   *
+   * @type {Array<Object>}
+   */
   const [pieces, setPieces] = useState([
-    { number1: 6, number2: 6, x: 750, y: 200, rotation: 0 },
+    {
+      number1: 6,
+      number2: 6,
+      x: INITIAL_POSITION.x,
+      y: INITIAL_POSITION.y,
+      rotation: 0,
+    },
   ]);
-  const [isDouble, setIsDouble] = useState(true); // Por defecto, la ficha es doble
-  const [isLeft, setIsLeft] = useState(false); // Dirección inicial: derecha
 
-  const handleDoublePiece = () => {
-    setIsDouble(true);
-  };
+  /**
+   * Estado que determina si las piezas a agregar son dobles o mixtas.
+   * Por defecto, es `true` (doble).
+   *
+   * @type {boolean}
+   */
+  const [isDouble, setIsDouble] = useState(true);
 
-  const handleMixedPiece = () => {
-    setIsDouble(false);
-  };
+  /**
+   * Estado que determina la dirección en la que se agregan las piezas:
+   * `true` para izquierda, `false` para derecha.
+   *
+   * @type {boolean}
+   */
+  const [isLeft, setIsLeft] = useState(false);
 
-  const handleLeftDirection = () => {
-    setIsLeft(true);
-  };
-
-  const handleRightDirection = () => {
-    setIsLeft(false);
-  };
-
+  /**
+   * Función que maneja la lógica para agregar una nueva pieza al tablero.
+   * La pieza se agrega a la izquierda o derecha dependiendo del estado `isLeft`.
+   * Además, la nueva pieza se genera en base a la última pieza del tablero y
+   * al tipo de ficha seleccionada (doble o mixta).
+   *
+   * @returns {void}
+   */
   const handleAddPiece = () => {
-    // Determinar la pieza comparando con la más a la izquierda o derecha
+    // Determina la pieza de comparación (izquierda o derecha)
     const comparisonPiece = isLeft ? pieces[0] : pieces[pieces.length - 1];
 
-    const newPiece = getNexPiece(
-      comparisonPiece,
-      isDouble,
-      TILE_WIDTH,
-      TILE_HEIGHT,
-      isLeft
-    );
+    // Genera una nueva pieza con base en la pieza de comparación, y la configuración de tipo y dirección
+    const newPiece = getNextPiece(comparisonPiece, isDouble, isLeft);
 
-    // Agregar la pieza al inicio si es izquierda, o al final si es derecha
+    // Agrega la nueva pieza al inicio o al final del tablero
     setPieces(isLeft ? [newPiece, ...pieces] : [...pieces, newPiece]);
   };
 
   return (
     <div>
-      <button onClick={handleDoublePiece}>Doble</button>
-      <button onClick={handleMixedPiece}>Mixta</button>
-      <button onClick={handleLeftDirection}>Izquierda</button>
-      <button onClick={handleRightDirection}>Derecha</button>
+      <button onClick={() => setIsDouble(true)}>Doble</button>
+      <button onClick={() => setIsDouble(false)}>Mixta</button>
+      <button onClick={() => setIsLeft(true)}>Izquierda</button>
+      <button onClick={() => setIsLeft(false)}>Derecha</button>
       <button onClick={handleAddPiece}>Agregar ficha</button>
-      <div style={{ position: "relative", width: "100%", height: "400px" }}>
+      <div
+        style={{
+          position: "relative",
+          width: BOARD_WIDTH,
+          height: BOARD_HEIGHT,
+        }}
+      >
         {pieces.map((piece, index) => (
           <DominoPiece key={index} {...piece} />
         ))}
