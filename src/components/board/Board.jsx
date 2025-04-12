@@ -7,18 +7,29 @@ import {
   BOARD_WIDTH,
   SIZES,
 } from "../../constants/DominoConstants";
+import styled from "styled-components"; // Importamos styled-components
 
-/**
- * Componente que representa el tablero de dominó, donde las piezas son agregadas
- * y mostradas en función de los parámetros configurados por el usuario.
- *
- * @component
- *
- * @returns {JSX.Element} Componente que muestra el tablero de dominó y permite agregar piezas.
- */
+// Creamos un contenedor para el tablero con styled-components
+const BoardContainer = styled.div`
+  position: relative;
+  width: ${BOARD_WIDTH};
+  height: ${BOARD_HEIGHT};
+`;
+
+const Button = styled.button`
+  margin: 5px;
+`;
+
+const SliderWrapper = styled.div`
+  margin-top: 15px;
+`;
+
+const SliderInput = styled.input`
+  width: 100%;
+`;
+
 const Board = () => {
   const [pieces, setPieces] = useState([
-    // Estado que mantiene las piezas de dominó en el tablero
     {
       number1: 6,
       number2: 6,
@@ -27,17 +38,10 @@ const Board = () => {
       rotation: 0,
     },
   ]);
+  const [isDouble, setIsDouble] = useState(true);
+  const [isLeft, setIsLeft] = useState(false);
+  const [scale, setScale] = useState(SIZES.SCALE);
 
-  const [isDouble, setIsDouble] = useState(true); // Estado que define si la ficha es doble
-  const [isLeft, setIsLeft] = useState(false); // Estado que define si las fichas se agregan a la izquierda
-  const [scale, setScale] = useState(SIZES.SCALE); // Estado que define el factor de escala de las piezas
-
-  /**
-   * Maneja la adición de una nueva ficha al tablero.
-   * Se obtiene una ficha según la pieza de comparación y la dirección (izquierda/derecha).
-   *
-   * @returns {void}
-   */
   const handleAddPiece = () => {
     const comparisonPiece = isLeft ? pieces[0] : pieces[pieces.length - 1];
     const newPiece = getNextPiece(comparisonPiece, isDouble, isLeft);
@@ -46,38 +50,31 @@ const Board = () => {
 
   return (
     <div>
-      {/* Botones para controlar las reglas del juego */}
-      <button onClick={() => setIsDouble(true)}>Doble</button>
-      <button onClick={() => setIsDouble(false)}>Mixta</button>
-      <button onClick={() => setIsLeft(true)}>Izquierda</button>
-      <button onClick={() => setIsLeft(false)}>Derecha</button>
-      <button onClick={handleAddPiece}>Agregar ficha</button>
-
-      {/* Control deslizante para cambiar la escala */}
       <div>
+        <Button onClick={() => setIsDouble(true)}>Doble</Button>
+        <Button onClick={() => setIsDouble(false)}>Mixta</Button>
+        <Button onClick={() => setIsLeft(true)}>Izquierda</Button>
+        <Button onClick={() => setIsLeft(false)}>Derecha</Button>
+        <Button onClick={handleAddPiece}>Agregar ficha</Button>
+      </div>
+
+      <SliderWrapper>
         <label>Escala: {scale}</label>
-        <input
+        <SliderInput
           type="range"
           min="0.5"
           max="2"
           step="0.05"
           value={scale}
-          onChange={(e) => setScale(parseFloat(e.target.value))} // Actualiza el estado de la escala
+          onChange={(e) => setScale(parseFloat(e.target.value))}
         />
-      </div>
+      </SliderWrapper>
 
-      <div
-        style={{
-          position: "relative",
-          width: BOARD_WIDTH,
-          height: BOARD_HEIGHT,
-        }}
-      >
-        {/* Renderiza las piezas en el tablero */}
+      <BoardContainer>
         {pieces.map((piece, index) => (
           <DominoPiece key={index} {...piece} scale={scale} />
         ))}
-      </div>
+      </BoardContainer>
     </div>
   );
 };

@@ -1,13 +1,12 @@
 // src/App.jsx
 import React from "react";
-import Board from "./components/board/Board";
 import "./App.css";
+import GameContainer from "./views/game/GameContainer";
 
 const App = () => {
   return (
     <div className="App">
-      <h1>Juego de Dominó</h1>
-      <Board />
+      <GameContainer />
     </div>
   );
 };

@@ -26,6 +26,6 @@ export const CONFIG = {
   CENTER_TRANSFORM: "translate(-50%, -50%)",
 };
 
-export const INITIAL_POSITION = { x: 750, y: 200 };
+export const INITIAL_POSITION = { x: 750, y: 400 };
 export const BOARD_HEIGHT = 400;
 export const BOARD_WIDTH = "100%";
