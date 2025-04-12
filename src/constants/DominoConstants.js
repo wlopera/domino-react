@@ -9,8 +9,9 @@
  * @property {number} TILE_HEIGHT - Alto de la ficha de dominó en píxeles (vertical).
  */
 export const SIZES = {
-  TILE_WIDTH: 60,
-  TILE_HEIGHT: 120,
+  TILE_WIDTH: 60, // Ancho original de la ficha
+  TILE_HEIGHT: 120, // Alto original de la ficha
+  SCALE: 1, // Factor de escala, puedes ajustarlo
 };
 
 /**
